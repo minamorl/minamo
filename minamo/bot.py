@@ -8,6 +8,8 @@ import urllib
 
 visited = []
 p = Persistent("minamo")
+
+
 def bot(url, depth=0):
     if is_visited(url) or depth > 3:
         return
@@ -20,23 +22,26 @@ def bot(url, depth=0):
     page = Page(url=url, title=title, description=description)
     p.save(page)
     create_bigram(page)
-    
 
-    print("visiting: ",title, url)
+    print("visiting: ", title, url)
     visit(url)
     for link in links:
-        bot(link, depth=depth+1)
+        bot(link, depth=depth + 1)
 
 # Will be replaced with redis
+
+
 def is_visited(url):
     global visited
     if url in visited:
         return True
     return False
 
+
 def visit(url):
     global visited
     visited.append(url)
+
 
 def get_title(html):
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -58,9 +63,8 @@ def make_description(html):
     text = soup.get_text()
     return text
 
+
 def join_url(base, url):
     joinded_url = urllib.parse.urljoin(base, url)
     s, n, path, params, q, frag = urllib.parse.urlparse(joinded_url)[:]
     return urllib.parse.urlunparse((s, n, path, params, None, None))
-    
-    
