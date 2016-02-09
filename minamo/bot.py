@@ -10,32 +10,33 @@ import asyncio
 visited = []
 p = Persistent("minamo")
 
+sem = asyncio.Semaphore(5)
 
 async def bot(session, url):
     links = await request(session, url)
 
-    async with asyncio.Semaphore(5):
-        await asyncio.wait([request(session, link) for link in links])
+    await asyncio.wait([request(session, link) for link in links])
 
 
 async def request(session, url):
     if not url.startswith("http://") and not url.startswith("https://"):
         return
 
-    async with session.get(url) as response:
-        if is_visited(url):
-            return
-        html = await response.text()
-        title = get_title(html)
-        print("visiting: ", title, url)
-        links = [join_url(url, x) for x in get_links(html)]
-        description = make_description(html)
-        page = Page(url=url, title=title, description=description)
-        p.save(page)
-        create_bigram(page)
-        mark_as_visited(url)
+    async with sem:
+        async with session.get(url) as response:
+            if is_visited(url):
+                return
+            html = await response.text()
+            title = get_title(html)
+            print("visiting: ", title, url)
+            links = [join_url(url, x) for x in get_links(html)]
+            description = make_description(html)
+            page = Page(url=url, title=title, description=description)
+            p.save(page)
+            create_bigram(page)
+            mark_as_visited(url)
 
-        return links
+            return links
 
 # Will be replaced with redis
 
