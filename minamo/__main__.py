@@ -3,6 +3,8 @@ from . import models
 from . import ngram
 from redisorm.core import Persistent
 from redis import StrictRedis
+import asyncio
+import aiohttp
 
 
 def show_search_results(query):
@@ -35,8 +37,12 @@ Search Result:  {keyword}
 
 def main():
     import sys
+    import asyncio
+
     if sys.argv[1] == "crawl":
-        bot.bot(sys.argv[2])
+        loop = asyncio.get_event_loop()
+        with aiohttp.ClientSession(loop=loop) as session:
+            loop.run_until_complete(bot.bot(session, sys.argv[2]))
         sys.exit()
 
     if sys.argv[1] == "s":

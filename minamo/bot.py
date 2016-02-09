@@ -1,32 +1,42 @@
 from redisorm.core import Persistent
 from .models import Page, URL
 from .ngram import create_bigram
-import requests
 import bs4
 import urllib
+import aiohttp
+import asyncio
 
 
 visited = []
 p = Persistent("minamo")
 
 
-def bot(url, depth=0):
-    if is_visited(url) or depth > 3:
+async def bot(session, url):
+    links = await request(session, url)
+
+    async with asyncio.Semaphore(5):
+        await asyncio.wait([request(session, link) for link in links])
+
+
+async def request(session, url):
+    if is_visited(url):
         return
+
     if not url.startswith("http://") and not url.startswith("https://"):
         return
-    html = requests.get(url).content
-    title = get_title(html)
-    links = [join_url(url, x) for x in get_links(html)]
-    description = make_description(html)
-    page = Page(url=url, title=title, description=description)
-    p.save(page)
-    create_bigram(page)
 
-    print("visiting: ", title, url)
-    visit(url)
-    for link in links:
-        bot(link, depth=depth + 1)
+    async with session.get(url) as response:
+        html = await response.text()
+        title = get_title(html)
+        print("visiting: ", title, url)
+        links = [join_url(url, x) for x in get_links(html)]
+        description = make_description(html)
+        page = Page(url=url, title=title, description=description)
+        p.save(page)
+        create_bigram(page)
+        mark_as_visited(url)
+
+        return links
 
 # Will be replaced with redis
 
@@ -38,7 +48,7 @@ def is_visited(url):
     return False
 
 
-def visit(url):
+def mark_as_visited(url):
     global visited
     visited.append(url)
 
