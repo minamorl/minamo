@@ -1,5 +1,6 @@
 from redisorm.core import Persistent
 from .models import Page, URL
+from .ngram import create_bigram
 import requests
 import bs4
 import urllib
@@ -18,6 +19,8 @@ def bot(url, depth=0):
     description = make_description(html)
     page = Page(url=url, title=title, description=description)
     p.save(page)
+    create_bigram(page)
+    
 
     print("visiting: ",title, url)
     visit(url)

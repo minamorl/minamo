@@ -39,10 +39,5 @@ if __name__ == '__main__':
         bot.bot(sys.argv[2])
         sys.exit()
 
-    if sys.argv[1] == "bi":
-        ngram.create_bigram()
-        sys.exit()
-
-
     if sys.argv[1] == "s":
         show_search_results(sys.argv[2])

@@ -17,11 +17,10 @@ def ngram(s, n):
             return
 
 
-def create_bigram():
+def create_bigram(page):
     p = Persistent("minamo")
     r = redis.StrictRedis(decode_responses=True)
 
-    for page in p.load_all(Page):
-        if page.description is not None:
-            for word in ngram(page.description, 2):
-                r.lpush(_bi(word), page.id)
+    if page.description is not None:
+        for word in ngram(page.description, 2):
+            r.lpush(_bi(word), page.id)
