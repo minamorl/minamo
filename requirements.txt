@@ -1,0 +1,7 @@
+redis
+redis-orm
+requests
+beautifulsoup4
+pytest
+virtualenv
+tox
