@@ -16,7 +16,7 @@ Search Result:  {keyword}
     r = StrictRedis(decode_responses=True)
 
     qgram = ngram.ngram(query, 2)
-    
+
     resultset = None
     for bi in list(qgram)[:-1]:
         if resultset is None:
@@ -33,7 +33,7 @@ Search Result:  {keyword}
         print(" ", page.url)
 
 
-if __name__ == '__main__':
+def main():
     import sys
     if sys.argv[1] == "crawl":
         bot.bot(sys.argv[2])
@@ -41,3 +41,6 @@ if __name__ == '__main__':
 
     if sys.argv[1] == "s":
         show_search_results(sys.argv[2])
+
+if __name__ == '__main__':
+    main()
