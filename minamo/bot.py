@@ -19,13 +19,12 @@ async def bot(session, url):
 
 
 async def request(session, url):
-    if is_visited(url):
-        return
-
     if not url.startswith("http://") and not url.startswith("https://"):
         return
 
     async with session.get(url) as response:
+        if is_visited(url):
+            return
         html = await response.text()
         title = get_title(html)
         print("visiting: ", title, url)

@@ -17,15 +17,15 @@ Search Result:  {keyword}
     p = Persistent("minamo")
     r = StrictRedis(decode_responses=True)
 
-    qgram = ngram.ngram(query, 2)
 
     resultset = None
-    for bi in list(qgram)[:-1]:
-        if resultset is None:
-            resultset = set(r.lrange("minamo:bi:{}".format(bi), 0, -1))
-        else:
-            resultset = resultset & set(r.lrange("minamo:bi:{}".format(bi), 0, -1))
-    print(resultset)
+    for _query in query.split(" "):
+        qgram = ngram.ngram(_query, 2)
+        for bi in list(qgram)[:-1]:
+            if resultset is None:
+                resultset = set(r.lrange("minamo:bi:{}".format(bi), 0, -1))
+            else:
+                resultset = resultset & set(r.lrange("minamo:bi:{}".format(bi), 0, -1))
 
     for page in (p.load(models.Page, x) for x in resultset):
         if page.title is None:
