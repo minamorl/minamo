@@ -6,15 +6,20 @@ import urllib
 
 
 visited = []
+p = Persistent("minamo")
 def bot(url, depth=0):
     if is_visited(url) or depth > 3:
+        return
+    if not url.startswith("http://") and not url.startswith("https://"):
         return
     html = requests.get(url).content
     title = get_title(html)
     links = [join_url(url, x) for x in get_links(html)]
     description = make_description(html)
-    Page(url=url, title=title, description=description)
-    print("visiting: ",title,url)
+    page = Page(url=url, title=title, description=description)
+    p.save(page)
+
+    print("visiting: ",title, url)
     visit(url)
     for link in links:
         bot(link, depth=depth+1)

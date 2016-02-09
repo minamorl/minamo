@@ -10,3 +10,4 @@ class Page(PersistentData):
     id = Column()
     url = Column()
     title = Column()
+    description = Column()
