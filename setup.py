@@ -13,7 +13,7 @@ setup(
     tests_require=['tox'],
     install_requires=[
         "redis-orm",
-        "requests",
         "beautifulsoup4",
+        "aiohttp",
     ]
 )
